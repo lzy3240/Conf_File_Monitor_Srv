@@ -220,14 +220,18 @@ func httpserver(str string) {
 }
 
 func init() {
-	log = mlog.Newlog("info", "./logs/", "ConfigFile_Monitor_Server", "day=1")
 	//1.1加载配置文件
 	err := ini.MapTo(cfg, "./conf/config.ini")
 	if err != nil {
-		log.Error("init config faild,err:%v", err)
+		fmt.Printf("init config faild,err:%v", err)
 		return
 	}
-	//1.2初始化数据库
+	//1.2初始化日志
+	tmp := strings.Split(cfg.LogConf.CutParameter, "|")
+	s := strings.Join(tmp, "=")
+	log = mlog.Newlog(cfg.LogConf.Level, cfg.LogConf.Florder, cfg.LogConf.Perfix, s)
+
+	//1.3初始化数据库
 	ms = msql.NewMsql(cfg.MysqlConf.User, cfg.MysqlConf.Passwd, cfg.MysqlConf.Host, cfg.MysqlConf.Port, cfg.MysqlConf.Database, cfg.MysqlConf.Charset)
 	//defer ms.Close()
 	log.Info("Init mysql success")
